@@ -1,3 +1,4 @@
+# I. PREPARAÇÃO DA BASE DE DADOS:
 # Instalar pacote e realizar apenas uma vez
 install.packages("readxl")
 library(readxl)
@@ -40,3 +41,10 @@ dados$Perfil_Utilizacao <- factor(
 head(dados) # Exibe primeiras linhas
 str(dados) # Exibe estrutura e tipos de variáveis
 colSums(is.na(dados)) # Verificar se há valores ausentes (NA) na base
+
+# -----------------------------------------------------------------------------
+# II. PARTE 2.1 - TABELA CRUZADA ENTRE TIPO DE PLANO E CANAL DE AQUISIÇÃO:
+
+# Tabela de frequência relativa, que precisa da de frequência absoluta:
+print("Tabela de Frequência Relativa entre Tipo de Plano e Canal de Aquisição")
+(tab_freq_relativa <- round(prop.table(table(dados$Tipo_Plano, dados$Canal_Aquisicao), margin = 2) * 100, 2))
