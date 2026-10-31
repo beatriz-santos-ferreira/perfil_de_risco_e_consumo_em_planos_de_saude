@@ -81,6 +81,9 @@ boxplot(Qtd_Consultas_Ano ~ Nivel_Sinistralidade, data = dados,
         ylab = "Qtd. de Consultas",
         col = "#49ee9c")
 
+print("Parte 3.2: Existe indício de que o padrão de uso do plano está associado ao nível de # Tabela cruzada de frequência relativa (% em cada nível de sinistralidade)")
+
+round(prop.table(table(dados$Perfil_Utilizacao, dados$Nivel_Sinistralidade), margin = 2) * 100, 2)
 
 # -----------------------------------------------------------------------------
 # V. PARTE 5 - DOENÇA PRÉ-EXISTENTE E SENSIBILIDADE DO CUSTO ÀS CONSULTAS:
