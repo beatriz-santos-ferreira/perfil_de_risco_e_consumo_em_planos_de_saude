@@ -11,22 +11,34 @@ compreender melhor o perfil de risco e de consumo desses beneficiários.
 No arquivo saude_amostra.xlsx são apresentadas as seguintes variáveis:
 
 Idade – Idade do beneficiário, em anos;
+
 Tempo_Plano_Meses – Tempo de vínculo com a operadora, em meses;
+
 Qtd_Consultas_Ano – Número de consultas médicas realizadas no último ano [0 a 45];
+
 Qtd_Internacoes_Ano – Número de internações hospitalares no último ano [0 a 8];
+
 Custo_Anual_Operadora_K – Custo total do beneficiário para a operadora, em milhares de
 reais;
+
 Mensalidade_K – Valor da mensalidade paga pelo beneficiário, em milhares de reais;
+
 Tipo_Plano – Abrangência e cobertura do plano de saúde (Ambulatorial, Hospitalar,
 Referencia, Premium);
+
 Regiao – Região geográfica do beneficiário no Brasil (Sudeste, Sul, Nordeste, CentroOeste,
 Norte);
+
 Possui_Pre_Existencia – Indica se o beneficiário declarou doença pré-existente (Sim, Nao);
+
 Canal_Aquisicao – Canal pelo qual o beneficiário contratou o plano (Corretor, Internet,
 Empresa, Loja);
+
 Nivel_Sinistralidade – Percentual do custo do beneficiário em relação à mensalidade paga
 (Baixo, Medio, Alto);
+
 Cancelou_Plano – Indica se o beneficiário cancelou o plano nos últimos 6 meses (Sim, Nao);
+
 Perfil_Utilizacao – Padrão de uso do plano de saúde (Raramente, Ocasional, Frequente,
 Critico);
 
