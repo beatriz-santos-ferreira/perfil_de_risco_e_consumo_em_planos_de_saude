@@ -1,5 +1,9 @@
+# -----------------------------------------------------------------------------
 # I. PREPARAÇÃO DA BASE DE DADOS:
-# Instalar pacote e realizar apenas uma vez
+
+print("Parte 0: Preparação da base de dados")
+
+# Instalar pacote APENAS UMA VEZ e carregar pacotes
 install.packages("readxl")
 install.packages("ggplot2")
 library(readxl)
@@ -45,15 +49,68 @@ str(dados) # Exibe estrutura e tipos de variáveis
 colSums(is.na(dados)) # Verificar se há valores ausentes (NA) na base
 
 # -----------------------------------------------------------------------------
-# II. PARTE 2.1 - TABELA CRUZADA ENTRE TIPO DE PLANO E CANAL DE AQUISIÇÃO:
+# II. PARTE 1 - VALIDANDO A CONSISTÊNCIA DOS DADOS:
+
+print("Parte 1: Validando a consistência dos dados")
+print("Parte 1.2:")
+
+# Contar quantidade de IDs de beneficiários duplicados na base de dados.
+sum(duplicated(dados$ID_Beneficiario))
+
+# Criar um vetor com o nome das variáveis quantitativas e exibir frequência de todas
+# Busca os valores mínimos e máximos, o desvio padrão e exibir cada variável quantitativa
+cols_quantitativas <- c("Idade", "Tempo_Plano_Meses", "Qtd_Consultas_Ano", 
+                        "Qtd_Internacoes_Ano", "Custo_Anual_Operadora_K", 
+                        "Mensalidade_K")
+summary(dados[, cols_quantitativas])
+sapply(dados[, cols_quantitativas], range, na.rm = TRUE)
+sapply(dados[, cols_quantitativas], sd, na.rm = TRUE)
+
+# Verificar se os valores passam os limites estipulados no enunciado.
+# Qtd de Consultas: 0 a 45
+# Qtd Internações: 0 a 8
+sum(dados$Qtd_Consultas_Ano < 0 | dados$Qtd_Consultas_Ano > 45, na.rm = TRUE)
+sum(dados$Qtd_Internacoes_Ano < 0 | dados$Qtd_Internacoes_Ano > 8, na.rm = TRUE)
+
+# Verificar se as variáveis quantitativas discretas possuem valores decimais, que estão incorretos
+sum(dados$Idade %% 1 != 0, na.rm = TRUE)
+sum(dados$Tempo_Plano_Meses %% 1 != 0, na.rm = TRUE)
+sum(dados$Qtd_Consultas_Ano %% 1 != 0, na.rm = TRUE)
+sum(dados$Qtd_Internacoes_Ano %% 1 != 0, na.rm = TRUE)
+
+# Verificar os outliers das variáveis quantitativas, e lista-los
+boxplot.stats(dados$Idade)$out
+boxplot.stats(dados$Tempo_Plano_Meses)$out
+boxplot.stats(dados$Qtd_Consultas_Ano)$out
+boxplot.stats(dados$Qtd_Internacoes_Ano)$out
+boxplot.stats(dados$Custo_Anual_Operadora_K)$out
+boxplot.stats(dados$Mensalidade_K)$out
+
+# Criar um vetor com o nome das variáveis qualitativas e exibir os valores de cada categoria de todas
+cols_qualitativas <- c("Tipo_Plano", "Regiao", "Possui_Pre_Existencia", 
+                        "Canal_Aquisicao", "Nivel_Sinistralidade", 
+                        "Cancelou_Plano", "Perfil_Utilizacao")
+summary(dados[, cols_qualitativas])
+
+# Calcular frequência relativa de cada categoria de cada variável qualitativa
+round(prop.table(table(dados$Tipo_Plano)) * 100, 1)
+round(prop.table(table(dados$Regiao)) * 100, 1)
+round(prop.table(table(dados$Possui_Pre_Existencia)) * 100, 1)
+round(prop.table(table(dados$Canal_Aquisicao)) * 100, 1)
+round(prop.table(table(dados$Nivel_Sinistralidade)) * 100, 1)
+round(prop.table(table(dados$Cancelou_Plano)) * 100, 1)
+round(prop.table(table(dados$Perfil_Utilizacao)) * 100, 1)
+
+# -----------------------------------------------------------------------------
+# III. PARTE 2 - TABELA CRUZADA ENTRE TIPO DE PLANO E CANAL DE AQUISIÇÃO:
 
 # Tabela de frequência relativa, que precisa da de frequência absoluta:
 print("Parte 2: Tipos de Plano e Canal de Aquisição estão associados?")
 print("Parte 2.1:")
-(tab_freq_relativa <- round(prop.table(table(dados$Tipo_Plano, dados$Canal_Aquisicao), margin = 2) * 100, 2))
+(round(prop.table(table(dados$Tipo_Plano, dados$Canal_Aquisicao), margin = 2) * 100, 2))
 
 # -----------------------------------------------------------------------------
-# III. PARTE 3 - USO DO PLANO POR NÍVEL DE SINISTRALIDADE:
+# IV. PARTE 3 - USO DO PLANO POR NÍVEL DE SINISTRALIDADE:
 
 print("Parte 3: Uso do plano por nível de sinistralidade")
 print("Parte 3.1: Custo Anual e Quantidade de Consultas No Ano por Nível De Sinistralidade.")
@@ -83,7 +140,49 @@ boxplot(Qtd_Consultas_Ano ~ Nivel_Sinistralidade, data = dados,
 
 print("Parte 3.2: Existe indício de que o padrão de uso do plano está associado ao nível de # Tabela cruzada de frequência relativa (% em cada nível de sinistralidade)")
 
+# Criar frequência relativa da Utilização do Perfil em relação ao Nível de Sinistralidade
 round(prop.table(table(dados$Perfil_Utilizacao, dados$Nivel_Sinistralidade), margin = 2) * 100, 2)
+
+# -----------------------------------------------------------------------------
+# V. PARTE 4 - HÁ INDÍCIOS DE QUE O TEMPO DE PLANO INFLUÊNCIA A MENSALIDADE?
+
+print("Parte 4: Há indícios de que o tempo de plano influencia a mensalidade?")
+print("Parte 4.1: Custo Anual e Quantidade de Internações no ano ")
+
+# Calcular frequência relativa de Quantidade de Internações no Ano
+(round(prop.table(table(dados$Qtd_Internacoes_Ano)) * 100, 1))
+
+# Gráfico Custo Anual por Quantidade de Internações
+boxplot(Custo_Anual_Operadora_K ~ Qtd_Internacoes_Ano, data = dados,
+        main = "Custo Anual por Quantidade de Internações",
+        xlab = "Qtd de Internações no Ano",
+        ylab = "Custo Anual (R$ mil)",
+        col = "#beb0f0")
+
+# Calcula o resumo do Custo separando por quantidade de Internações (0, 1, 2...)
+tapply(dados$Custo_Anual_Operadora_K, dados$Qtd_Internacoes_Ano, summary)
+# Desvio-padrão do Custo Anual para cada quantidade de internações
+tapply(dados$Custo_Anual_Operadora_K, dados$Qtd_Internacoes_Ano, sd)
+
+# Calcular coeficiente de relação linear entre Custo Anual e Qtd de Internações
+# Próximo de 1: Relação positiva
+# Próximo de 0: Nenhuma relação aparente
+# Próximo de -1: Relação inversa
+cor(dados$Custo_Anual_Operadora_K, dados$Qtd_Internacoes_Ano)
+
+print("Parte 4.2: Mensalidade por tempo de plano ")
+
+# Gráfico Mensalidade por Tempo de Vínculo
+plot(dados$Tempo_Plano_Meses, dados$Mensalidade_K,
+     main = "Mensalidade por Tempo de Vínculo",
+     xlab = "Tempo de Vínculo (meses)",
+     ylab = "Mensalidade (R$ mil)",
+     col = "#5511a3",
+     pch = 19)
+abline(lm(Mensalidade_K ~ Tempo_Plano_Meses, data = dados), col = "red", lwd = 2)
+
+# Calcular coeficiente de relação linear entre Tempo de Vínculo e Mensalidade
+cor(dados$Tempo_Plano_Meses, dados$Mensalidade_K)
 
 # -----------------------------------------------------------------------------
 # V. PARTE 5 - DOENÇA PRÉ-EXISTENTE E SENSIBILIDADE DO CUSTO ÀS CONSULTAS:
@@ -104,12 +203,10 @@ coef(mod_sem_preex)
 
 # Calcular o Erro Quadrático Médio (EQM):
 # Desvio total entre os custos reais dos clientes e o custo previsto pela linha reta.
-eqm_com_preex <- sum(residuals(mod_com_preex)^2)
-eqm_sem_preex <- sum(residuals(mod_sem_preex)^2)
-
-# Exibir os resultados formatados no console
-cat("EQM - Com Doença Pré-Existente:", round(eqm_com_preex, 2), "\n")
-cat("EQM - Sem Doença Pré-Existente:", round(eqm_sem_preex, 2), "\n")
+print("EQM - COM Doença Pré-Existente:")
+(eqm_com_preex <- sum(residuals(mod_com_preex)^2))
+print("EQM - SEM Doença Pré-Existente:")
+(eqm_sem_preex <- sum(residuals(mod_sem_preex)^2))
 
 # Gráfico Beneficiários COM Doença Pré-Existente
 plot(dados_com_preex$Qtd_Consultas_Ano, dados_com_preex$Custo_Anual_Operadora_K,
