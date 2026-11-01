@@ -225,7 +225,9 @@ dev.off()
 cor(dados$Tempo_Plano_Meses, dados$Mensalidade_K)
 
 # -----------------------------------------------------------------------------
-# V. PARTE 5 - DOENÇA PRÉ-EXISTENTE E SENSIBILIDADE DO CUSTO ÀS CONSULTAS:
+# VI. PARTE 5 - DOENÇA PRÉ-EXISTENTE E SENSIBILIDADE DO CUSTO ÀS CONSULTAS:
+
+print("Parte 5: Doença pré-existente e sensibilidade do custo às consultas")
 
 # Subset: Filtra a planilha de dados criando
 # um subconjunto com base em uma regra
@@ -293,3 +295,44 @@ legend("topleft",
   inset = c(0.02, 0.01)
 )
 dev.off()
+
+# -----------------------------------------------------------------------------
+# VII. PARTE 6 - EXPLORANDO POR CONTA PRÓPRIA:
+
+print("Parte 6: Explorando por conta própria:
+Canal de aquisição e cancelamento do plano")
+
+# Criar tabela cruzada de frequência absoluta
+# entre canal de aquisição e cancelamento do_plano)
+tab_cancel_abs <- table(dados$Canal_Aquisicao, dados$Cancelou_Plano)
+
+# Calcular total de beneficiários que contrataram por cada canal
+totais_canal <- rowSums(tab_cancel_abs)
+
+# Calcular o número de beneficiários que
+# cancelaram o plano, utilizando a coluna "Sim"
+cancelamentos <- tab_cancel_abs[, "Sim"]
+
+# Calcular percentual de cancelamento dentro
+# de cada canal, com proporção por Linha
+pct_cancelamento <- round((cancelamentos / totais_canal) * 100, 2)
+
+# Organização dos resultados em um data.frame estruturado
+(tabela_pt_6 <- data.frame(
+  `Canal de aquisição` = names(totais_canal),
+  `Total de beneficiários` = as.numeric(totais_canal),
+  `Número de cancelamentos` = as.numeric(cancelamentos),
+  `Percentual de cancelamento no canal (%)` = pct_cancelamento,
+  check.names = FALSE
+))
+
+# Verificar consistência dos totais exigidos pelo trabalho:
+print("Verificação dos dados:")
+print(paste0(
+  "Total de Beneficiários (N = 500): ",
+  sum(tabela_pt_6$`Total de beneficiários`)
+))
+print(paste0(
+  "Total de Cancelamentos (N = 142): ",
+  sum(tabela_pt_6$`Número de cancelamentos`)
+))
