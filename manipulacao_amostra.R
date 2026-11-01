@@ -121,22 +121,26 @@ aggregate(Custo_Anual_Operadora_K ~ Nivel_Sinistralidade, data = dados, summary)
 aggregate(Custo_Anual_Operadora_K ~ Nivel_Sinistralidade, data = dados, sd)
 
 # Gráfico Custo por Sinistralidade
+png("boxplot_custo_sinistralidade.png", width = 1000, height = 750, res = 130)
 boxplot(Custo_Anual_Operadora_K ~ Nivel_Sinistralidade, data = dados,
         main = "Custo Anual por Nível de Sinistralidade",
         xlab = "Nível de Sinistralidade", 
         ylab = "Custo Anual (R$ mil)",
         col = "#40cf2d")
+dev.off()
 
 # Calcular medidas numéricas e o desvio-padrão da Quantidade de Consultas:
 aggregate(Qtd_Consultas_Ano ~ Nivel_Sinistralidade, data = dados, summary)
 aggregate(Qtd_Consultas_Ano ~ Nivel_Sinistralidade, data = dados, sd)
 
 # Gráfico Quantidade de Consultas por Sinistralidade
+png("boxplot_consultas_sinistralidade.png", width = 1000, height = 750, res = 130)
 boxplot(Qtd_Consultas_Ano ~ Nivel_Sinistralidade, data = dados,
         main = "Quantidade de Consultas por Nível de Sinistralidade",
         xlab = "Nível de Sinistralidade", 
         ylab = "Qtd. de Consultas",
         col = "#49ee9c")
+dev.off()
 
 print("Parte 3.2: Existe indício de que o padrão de uso do plano está associado ao nível de # Tabela cruzada de frequência relativa (% em cada nível de sinistralidade)")
 
@@ -153,6 +157,8 @@ print("Parte 4.1: Custo Anual e Quantidade de Internações no ano ")
 (round(prop.table(table(dados$Qtd_Internacoes_Ano)) * 100, 1))
 
 # Gráfico Custo Anual por Quantidade de Internações
+png("boxplot_consultas_sinistralidade.png", width = 1000, height = 750, res = 130)
+
 boxplot(Custo_Anual_Operadora_K ~ Qtd_Internacoes_Ano, data = dados,
         main = "Custo Anual por Quantidade de Internações",
         xlab = "Qtd de Internações no Ano",
