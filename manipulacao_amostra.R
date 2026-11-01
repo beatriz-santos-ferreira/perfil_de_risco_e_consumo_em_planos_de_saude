@@ -78,13 +78,21 @@ sum(dados$Tempo_Plano_Meses %% 1 != 0, na.rm = TRUE)
 sum(dados$Qtd_Consultas_Ano %% 1 != 0, na.rm = TRUE)
 sum(dados$Qtd_Internacoes_Ano %% 1 != 0, na.rm = TRUE)
 
-# Verificar os outliers das variáveis quantitativas, e lista-los
-boxplot.stats(dados$Idade)$out
-boxplot.stats(dados$Tempo_Plano_Meses)$out
-boxplot.stats(dados$Qtd_Consultas_Ano)$out
-boxplot.stats(dados$Qtd_Internacoes_Ano)$out
-boxplot.stats(dados$Custo_Anual_Operadora_K)$out
-boxplot.stats(dados$Mensalidade_K)$out
+# Função que calcula os outliers usando as mesmas regras do summary()
+outliers_summary <- function(x) {
+  q1  <- quantile(x, 0.25, na.rm = TRUE)
+  q3  <- quantile(x, 0.75, na.rm = TRUE)
+  iqr <- q3 - q1
+  limite_inf <- q1 - 1.5 * iqr
+  limite_sup <- q3 + 1.5 * iqr
+  # Retorna os valores que ultrapassam os limites
+  x[x < limite_inf | x > limite_sup]}
+
+# Listar os valores discrepantes de todas as variáveis pela regra do summary
+lapply(dados[cols_quantitativas], outliers_summary)
+
+# Contar a quantidade exata de outliers por variável pela regra do summary
+sapply(dados[cols_quantitativas], function(x) length(outliers_summary(x)))
 
 # Criar um vetor com o nome das variáveis qualitativas e exibir os valores de cada categoria de todas
 cols_qualitativas <- c("Tipo_Plano", "Regiao", "Possui_Pre_Existencia", 
@@ -157,13 +165,13 @@ print("Parte 4.1: Custo Anual e Quantidade de Internações no ano ")
 (round(prop.table(table(dados$Qtd_Internacoes_Ano)) * 100, 1))
 
 # Gráfico Custo Anual por Quantidade de Internações
-png("boxplot_consultas_sinistralidade.png", width = 1000, height = 750, res = 130)
-
+png("boxplot_custo_internacoes.png", width = 1000, height = 750, res = 130)
 boxplot(Custo_Anual_Operadora_K ~ Qtd_Internacoes_Ano, data = dados,
         main = "Custo Anual por Quantidade de Internações",
         xlab = "Qtd de Internações no Ano",
         ylab = "Custo Anual (R$ mil)",
         col = "#beb0f0")
+dev.off()
 
 # Calcula o resumo do Custo separando por quantidade de Internações (0, 1, 2...)
 tapply(dados$Custo_Anual_Operadora_K, dados$Qtd_Internacoes_Ano, summary)
@@ -179,6 +187,7 @@ cor(dados$Custo_Anual_Operadora_K, dados$Qtd_Internacoes_Ano)
 print("Parte 4.2: Mensalidade por tempo de plano ")
 
 # Gráfico Mensalidade por Tempo de Vínculo
+png("tempo_mensalidade.png", width = 1000, height = 750, res = 130)
 plot(dados$Tempo_Plano_Meses, dados$Mensalidade_K,
      main = "Mensalidade por Tempo de Vínculo",
      xlab = "Tempo de Vínculo (meses)",
@@ -186,6 +195,7 @@ plot(dados$Tempo_Plano_Meses, dados$Mensalidade_K,
      col = "#5511a3",
      pch = 19)
 abline(lm(Mensalidade_K ~ Tempo_Plano_Meses, data = dados), col = "red", lwd = 2)
+dev.off()
 
 # Calcular coeficiente de relação linear entre Tempo de Vínculo e Mensalidade
 cor(dados$Tempo_Plano_Meses, dados$Mensalidade_K)
@@ -215,6 +225,7 @@ print("EQM - SEM Doença Pré-Existente:")
 (eqm_sem_preex <- sum(residuals(mod_sem_preex)^2))
 
 # Gráfico Beneficiários COM Doença Pré-Existente
+png("custo_com_doenca_preex.png", width = 1000, height = 750, res = 130)
 plot(dados_com_preex$Qtd_Consultas_Ano, dados_com_preex$Custo_Anual_Operadora_K,
      main = "Custo Anual x Consultas Anuais (Com Doença Pré-Existente)",
      xlab = "Quantidade de Consultas no Ano",
@@ -226,8 +237,10 @@ legend("bottomright",
        text.col = "#6d0606",
        cex = 1,
        inset = c(0.2, 0.01))
+dev.off()
 
 # Gráfico Beneficiários SEM Doença Pré-Existente
+png("custo_sem_doenca_preex.png", width = 1000, height = 750, res = 130)
 plot(dados_sem_preex$Qtd_Consultas_Ano, dados_sem_preex$Custo_Anual_Operadora_K,
      main = "Custo Anual x Consultas Anuais (Sem Doença Pré-Existente)",
      xlab = "Quantidade de Consultas no Ano",
@@ -239,4 +252,5 @@ legend("topleft",
        text.col = "#020270",
        cex = 1,
        inset = c(0.02, 0.01))
+dev.off()
 
